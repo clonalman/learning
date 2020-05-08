@@ -1,0 +1,47 @@
+一、遍历
+----------------------------------------------------------------------------------
+g.V().has('name', hercules').out('father').out('father').values('name')
+
+1. g：当前图的遍历句柄。
+2. V：图中所有的顶点。
+3. has('name', 'hercules')：过滤出顶点name为hercules的顶点。
+4. out('father')：从hercules顶点遍历出边为father的边。
+5. out('father')：从hercules的father顶点遍历出边为father的边。
+6. name：获取hercules祖父顶点的name属性的值。
+----------------------------------------------------------------------------------
+g.V().has('name', 'hercules').repeat(out('father')).emit().values('name')
+
+
+
+----------------------------------------------------------------------------------
+g.V(hercules).as('h').out('battled').in('battled').where(neq('h')).values('name')
+
+4个链接函数：
+1. out: V -> V
+2. in: V -> V
+3. except: U -> U
+4. values: V -> U
+----------------------------------------------------------------------------------
+
+二、遍历迭代
+
+iterate() - 预期或者可以忽略空值。
+next() - 获取一个结果，一定要先通过hasNext()判断。
+next(int n) - 获取第n个结果，一定要先通过hasNext()判断。
+toList() - 获取所有的结果作为一个list，如果没有结果则返回空列表。
+
+例子：
+Traversal t = g.V().has("name", "pluto"); // Define a traversal
+// Note the traversal is not executed/iterated yet
+Vertex pluto = null;
+if (t.hasNext()) { // Check if results are available
+    pluto = g.V().has("name", "pluto").next(); // Get one result
+    g.V(pluto).drop().iterate(); // Execute a traversal to drop pluto from graph
+}
+// Note the traversal can be cloned for reuse
+Traversal tt = t.asAdmin().clone();
+if (tt.hasNext()) {
+    System.err.println("pluto was not dropped!");
+}
+List<Vertex> gods = g.V().hasLabel("god").toList(); // Find all the gods
+
