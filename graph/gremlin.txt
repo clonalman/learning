@@ -1,4 +1,4 @@
-一、遍历
+﻿一、遍历
 ----------------------------------------------------------------------------------
 g.V().has('name', hercules').out('father').out('father').values('name')
 
@@ -11,7 +11,12 @@ g.V().has('name', hercules').out('father').out('father').values('name')
 ----------------------------------------------------------------------------------
 g.V().has('name', 'hercules').repeat(out('father')).emit().values('name')
 
-
+循环操作：
+repeat(): 指定要重复执行的语句，如repeat(out('friend'))
+times(): 指定要重复执行的次数，如执行3次repeat(out('friend')).times(3)
+until(): 指定循环终止的条件，如一直找到某个名字的朋友为止repeat(out('friend')).until(has('name','xiaofang'))
+emit(): 指定循环语句的执行过程中收集数据的条件，每一步的结果只要符合条件则被收集，不指定条件时收集所有结果
+loops(): 当前循环的次数，可用于控制最大循环次数等，如最多执行3次repeat(out('friend')).until(loops().is(3))
 
 ----------------------------------------------------------------------------------
 g.V(hercules).as('h').out('battled').in('battled').where(neq('h')).values('name')
@@ -45,3 +50,48 @@ if (tt.hasNext()) {
 }
 List<Vertex> gods = g.V().hasLabel("god").toList(); // Find all the gods
 
+三、路径(path、simplePath、cyclicPath)
+
+// “HugeGraph”顶点到与其有直接关联的顶点的路径（仅包含顶点）
+g.V().hasLabel('software').has('name','HugeGraph').both().path()
+
+// “HugeGraph”顶点到与其有直接关联的顶点的路径（包含顶点和边）
+g.V().hasLabel('software').has('name','HugeGraph')
+ .bothE().otherV().path()
+
+// “HugeGraph”顶点到与其有直接关联的顶点的路径（包含顶点和边）
+// 用“name”属性代表person和software顶点，用“weight”属性代表边
+g.V().hasLabel('software').has('name','HugeGraph')
+ .bothE().otherV().path().by('name').by('weight')
+
+// “HugeGraph”顶点到与其有两层关系的顶点的不含环路的路径（只包含顶点）
+g.V().hasLabel('software').has('name','HugeGraph')
+ .both().both().simplePath().path()
+
+// “HugeGraph”顶点到与其有两层关系的顶点的包含环路的路径（只包含顶点）
+g.V().hasLabel('software').has('name','HugeGraph')
+ .both().both().cyclicPath().path()
+
+四、更多例子：
+
+查找子树：
+
+// 查找从一个节点出发，到
+// 叶子节点结束的所有路径
+// 这些路径的集合为一颗子树(子图)
+g.V('okram')
+ .repeat(out())
+ .until(outE().count().is(0))
+ .path()
+
+
+查找两点之间的最短路径：
+// 已知两个顶点'okram'和'javeme'，
+// 通过任意关系来找到这两点之间的路径
+// 且限制了最大深度为3
+// 若存在那么第一条结果即是最短路径
+g.V('okram')
+ .repeat(bothE().otherV().simplePath())
+ .until(hasId('javeme').and().loops().is(lte(3)))
+ .hasId('javeme')
+ .path()
