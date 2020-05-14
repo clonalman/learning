@@ -1,0 +1,45 @@
+﻿Janusgraph部署
+
+1、将JDK版本升级到1.8
+
+
+
+2、Janusgraph官网下载安装包，并解压(janusgraph-0.5.2.zip)
+
+3、安装elasticsearch，新建非root用户es,elasticsearch不能用root用户启动
+
+4、安装cloudera平台
+
+5、Janusgraph配置：
+
+1）配置使用[conf/janusgrap-hbase-es.properties]
+
+  graphs: { 
+    graph: onf/janusgrap-hbase-es.properties 
+  } 
+2）配置hbase和es的hostname[conf/gremlin-server/janusgraph-hbase-es.properties]
+
+
+3）配置远程连接集群 [conf/remote-objects.yaml]
+
+  hosts:[hadoop003,hadoop004,hadoop005]
+
+6、启动服务
+  bin/gremlin-server/gremlin-server.sh conf/gremlin-server/gremlin-server.yaml
+
+7、查看状态
+
+  bin/janusgraph.sh status
+
+8、测试（Gremlin Console）
+
+   在hbase中查看是否创建JanusGraph
+   修改conf/remote.yaml，修改hosts=[localhost]为远程服务器地址
+   启动Gremlin Console bin/gremlin.sh
+   
+   :remote connect tinkerpop.server conf/remote.yaml
+   :> graph.addVertex("name", "stephen")
+   :> g.V().values('name')
+   
+
+
