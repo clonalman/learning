@@ -6,6 +6,9 @@
 
 2、Janusgraph官网下载安装包，并解压(janusgraph-0.5.2.zip)
 
+   full版本：bin/janusgraph.sh 启动Gremlin Server和Cassandra和Elasticsearch.
+
+
 3、安装elasticsearch，新建非root用户es,elasticsearch不能用root用户启动
 
 4、安装cloudera平台
@@ -41,5 +44,23 @@
    :> graph.addVertex("name", "stephen")
    :> g.V().values('name')
    
+9、可视化
+
+   Cytoscape
+   Gephi
+   Graphexp
+   KeyLines
+   Linkurious
+
+Janusgraph使用：
+
+1、Gremlin Console
+
+JanusGraph中的Gremlin命令行工具可以方便的启动JanusGraph并和其交互
 
 
+2、JanusGraph Embedded
+
+基于JVM应用的内部, 也能用JanusGraphFactory创建实例, . 在这种情况下, JanusGraph属于应用的一部分, 应用可以直接调用它的接口
+
+3 Short Codes

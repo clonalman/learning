@@ -1,0 +1,3 @@
+1、Column family table does not exist in region hbase:meta
+
+原因是jar 里面使用的依赖版本与服务器版本不一致导致
