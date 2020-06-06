@@ -1,8 +1,8 @@
-﻿//本地生成SSH key
-ssh-keygen -t rsa -C "clonalman@hotmail.com"
-//登录github,添加"SSH Keys"
-本地：~/.ssh/id_rsa.pub
-远程：https://github.com/settings/ssh 
+﻿//本地生成SSH key  
+ssh-keygen -t rsa -C "clonalman@hotmail.com"  
+//登录github,添加"SSH Keys"  
+本地：~/.ssh/id_rsa.pub  
+远程：https://github.com/settings/ssh  
 
 //本地项目文件夹生成一个.git文件  
 git init  
