@@ -72,6 +72,9 @@ g.V().hasLabel('software').has('name','HugeGraph')
 g.V().hasLabel('software').has('name','HugeGraph')
  .both().both().cyclicPath().path()
 
+
+g.V().shortestPath().with(ShortestPath.edges, Direction.IN).with(ShortestPath.target, __.has('nam
+
 四、更多例子：
 
 查找子树：
@@ -95,3 +98,90 @@ g.V('okram')
  .until(hasId('javeme').and().loops().is(lte(3)))
  .hasId('javeme')
  .path()
+
+五、操作：
+
+#删除所有顶点：
+
+g.V().drop()
+
+#查询所有节点及其属性: 
+
+g.V().valueMap(true)
+
+#查询所有边及其属性:
+
+g.E().valueMap(true)
+
+
+#遍历
+
+g = graph.traversal()
+
+#创建schema：
+
+Edge(MULTI/SIMPLE/MANY2ONE/ONE2MANY)
+mgmt = graph.openManagement()
+person = mgmt.makeVertexLabel('person').multiplicity(MULTI).make()
+software = mgmt.makeEdgeLabel('software').multiplicity(MULTI).make()
+mgmt.commit()
+
+
+name = mgmt.makePropertyKey('name').dataType(String.class).cardinality(Cardinality.SET).make()
+
+
+#Displaying Schema Information
+mgmt = graph.openManagement()
+mgmt.printSchema()
+
+
+//查询一度好友
+g.V('1500771').out()
+//查询二度好友
+g.V('1500771').out().out().dedup().not(hasId('1500771'))
+//查询共同好友数
+g.V('1500771').out().out().hasId('2165197').path().simplePath().c
+
+
+# 查看使用的插件列表
+gremlin> :plugin list
+==>janusgraph.imports[active]
+==>tinkerpop.server[active]
+==>tinkerpop.gephi[active]
+==>tinkerpop.utilities[active]
+==>tinkerpop.sugar
+==>tinkerpop.credentials
+==>tinkerpop.hadoop[active]
+==>tinkerpop.spark[active]
+==>tinkerpop.tinkergraph[active]
+
+
+# 创建简单的 Modern 图
+gremlin> graph = TinkerFactory.createModern()
+==>tinkergraph[vertices:6 edges:6]
+
+
+六：异常
+
+1、Vertex Label with given name does not exist
+使用非默认数据库（automatic schema creation is disabled）
+you need to define the schema (including all labels, properties, and indexes on vertices and edges) before you can use them.
+显式创建schema
+
+
+2、Property addition is not supported
+不能后期动态添加属性
+
+七、导入
+
+全量导入：OneTimeBulkLoader
+增量导入：IncrementBulkLoader
+
+JanusGraphFactory.drop(graph);
+
+
+:remote connect tinkerpop.server conf/remote.yaml session
+:remote console
+
+
+g.V().valueMap(true).fold()

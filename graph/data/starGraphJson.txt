@@ -1,0 +1,22 @@
+public StringBuilder generatorStarGraphJson(Vertex vertex, Edge edge, StringBuilder starGraphJson){
+	String inVId;
+	String outVId;
+	String VId;
+	starGraphJson.append("{").append("\"id\":"+vertex.id()+","+"\"label\":\""+vertex.label()+"\",");
+	//这种情况有outE和inE，outE中会有inV信息,inE会有一个inV
+	inVId = edge.inVertex().id().toString();
+	outVId = edge.outVertex().id().toString();
+	VId = vertex.id().toString();
+	if(inVId.equalsIgnoreCase(VId)){
+		starGraphJson.append("\"outE\":{").append("\""+edge.label()+"\":[{").append("\"id\":\""+edge.id()+"\",")
+				.append("\"inV\":"+edge.inVertex().id()+",").append("\"properties\":{"+concatEdgeProperties(edge)+"}}]},");
+	}else if(outVId.equalsIgnoreCase(VId)){
+		starGraphJson.append("\"inE\":{").append("\""+edge.label()+"\":[{").append("\"id\":\""+edge.id()+"\",")
+				.append("\"outV\":"+edge.inVertex().id()+",").append("\"properties\":{"+concatEdgeProperties(edge)+"}}]},");
+	}else{
+		throw new Exception("点边不对应数据错误！！！");
+	}
+	//拼接点的properties
+	starGraphJson.append("\"properties\":{").append(concatVertexProperties(vertex)).append("}}");
+	return  starGraphJson;
+}

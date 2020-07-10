@@ -1,0 +1,24 @@
+支持ThinkerPop框架的图形数据库
+Amazon Neptune - Fully-managed graph database service.
+Bitsy - A small, fast, embeddable, durable in-memory graph database.
+Blazegraph - RDF graph database with OLTP support.
+CosmosDB - Microsoft’s distributed OLTP graph database.
+ChronoGraph - A versioned graph database.
+DSEGraph - DataStax graph database with OLTP and OLAP support.
+GRAKN.AI - Distributed OLTP/OLAP knowledge graph system.
+Hadoop (Spark) - OLAP graph processor using Spark.
+HGraphDB - OLTP graph database running on Apache HBase.
+IBM Graph - OLTP graph database as a service.
+JanusGraph - Distributed OLTP and OLAP graph database with BerkeleyDB, Apache Cassandra and Apache HBase support.
+JanusGraph (Amazon) - The Amazon DynamoDB Storage Backend for JanusGraph.
+Neo4j- OLTP graph database (embedded and high availability).
+neo4j-gremlin-bolt - OLTP graph database (using Bolt Protocol).
+OrientDB - OLTP graph database
+Apache S2Graph - OLTP graph database running on Apache HBase.
+Sqlg - OLTP implementation on SQL databases.
+Stardog - RDF graph database with OLTP and OLAP support.
+TinkerGraph - In-memory OLTP and OLAP reference implementation.
+Titan - Distributed OLTP and OLAP graph database with BerkeleyDB, Apache Cassandra and Apache HBase support.
+Titan (Amazon) - The Amazon DynamoDB storage backend for Titan.
+Titan (Tupl) - The Tupl storage backend for Titan.
+Unipop - OLTP Elasticsearch and JDBC backed graph.

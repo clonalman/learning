@@ -52,6 +52,118 @@
    KeyLines
    Linkurious
 
+10、多图配置
+
+
+graphs: { 
+graph: conf/gremlin-server/janusgraph-cassandra-es-server.properties, 
+mazhenGraph: conf/gremlin-server/janusgraph-mazhen.properties 
+} 
+
+
+清除数据:
+JanusGraphCleanup.clear(graph)
+
+
+
+11、索引（Indexing）
+
+States (SchemaStatus)：
+INSTALLED The index is installed in the system but not yet registered with all instances in the cluster
+REGISTERED The index is registered with all instances in the cluster but not (yet) enabled
+ENABLED The index is enabled and in use
+DISABLED The index is disabled and no longer in use
+
+
+Actions (SchemaAction)：
+REGISTER_INDEX Registers the index with all instances in the graph cluster. After an index is installed, it must be registered with all graph instances
+REINDEX Re-builds the index from the graph
+ENABLE_INDEX Enables the index so that it can be used by the query processing engine. An index must be registered before it can be enabled.
+DISABLE_INDEX Disables the index in the graph so that it is no longer used.
+REMOVE_INDEX Removes the index from the graph (optional operation). Only on composite index.
+
+
+
+Update action [REMOVE_INDEX] cannot be invoked for index with status [INSTALLED]
+
+
+Force change from Installed to Registered:
+
+mgmt = graph.openManagement()
+mgmt.updateIndex(mgmt.getGraphIndex("<index-name>"), SchemaAction.REGISTER_INDEX).get()
+mgmt.commit()
+
+
+a、创建索引前
+关闭事物
+for(i=0;i<graph.getOpenTransactions().size();i++) {graph.getOpenTransactions().getAt(i).rollback()}
+
+关闭幽灵实例
+
+
+b、查看索引状态
+Index.getIndexStatus(mgmt.getPropertyKey('idx_vertex_name'))
+
+
+c、等待状态完成
+
+ManagementSystem.awaitGraphIndexStatus(graph, 'idx_vertex_name').status(SchemaStatus.DISABLE).call()
+
+
+graph = JanusGraphFactory.open(...)
+mgmt = graph.openManagement()
+mr = new MapReduceIndexManagement(graph)
+mr.updateIndex(mgmt.getRelationIndex(mgmt.getRelationType("battled"), "battlesByTime"), SchemaAction.REINDEX).get()
+mgmt.commit()
+
+
+
+GraphTraversalSource g = janusGraph.traversal(); 
+    JanusGraphManagement janusGraphManagement = janusGraph.openManagement(); 
+    JanusGraphIndex nameIndex = janusGraphManagement.getGraphIndex("idx_vertex_name"); 
+    PropertyKey name = janusGraphManagement.getPropertyKey("name"); 
+    SchemaStatus indexStatus = phoneIndex.getIndexStatus(name); 
+    String name = phoneIndex.name(); 
+    System.out.println(name); 
+    if (indexStatus == INSTALLED) { 
+     janusGraphManagement.commit(); 
+     janusGraph.tx().commit();
+
+    }
+
+
+//禁用索引，删除索引
+
+// Disable the "phoneIndex" composite index 
+janusGraphManagement = janusGraph.openManagement() 
+nameIndex = janusGraphManagement.getGraphIndex('idx_vertex_name) 
+janusGraphManagement.updateIndex(phoneIndex, SchemaAction.DISABLE_INDEX).get() 
+janusGraphManagement.commit() 
+janusGraph.tx().commit() 
+
+// Block until the SchemaStatus transitions from INSTALLED to REGISTERED 
+ManagementSystem.awaitGraphIndexStatus(janusGraph, 'phoneIndex').status(SchemaStatus.DISABLED).call() 
+
+// Delete the index using TitanManagement 
+janusGraphManagement = janusGraph.openManagement() 
+phoneIndex = janusGraphManagement.getGraphIndex('phoneIndex') 
+future = janusGraphManagement.updateIndex(phoneIndex, SchemaAction.REMOVE_INDEX) 
+janusGraphManagement.commit() 
+janusGraph.tx().commit() 
+
+
+
+index mgmt = graph.openManagement();mr = new MapReduceIndexManagement(graph);mr.updateIndex(mgmt.getGraphIndex("idx_vert_name"), SchemaAction.REINDEX).get() 
+
+
+
+
+
+
+
+
+
+
 Janusgraph使用：
 
 1、Gremlin Console
@@ -64,3 +176,44 @@ JanusGraph中的Gremlin命令行工具可以方便的启动JanusGraph并和其�
 基于JVM应用的内部, 也能用JanusGraphFactory创建实例, . 在这种情况下, JanusGraph属于应用的一部分, 应用可以直接调用它的接口
 
 3 Short Codes
+
+
+Janusgraph特性(JanusGroup)
+
+1、不支持用户提供自定义ID
+   Vertex and Edge does not support user supplied identifiers
+
+2、
+
+缺陷1:并没有实现事务，无论是hbase还是solr均不支持事务，janusGraph只是号称说支持事务。
+
+缺陷2:没有发挥MPP思想，一个计算节点负责所有的图遍历。存储层hbase分布式化了，但自身计算节点并没有分布式化。janusGraph把hbase当做黑盒，纯客户端，图遍历拉取所有数据，没有深入定制到表格存储里面，这也是可预见可修改的地方。
+
+缺陷3：gremlin-server单机运算处理能力有限，势必要水平扩展，但core包中使用了有很多cache,有状态的，集群模式下要考虑内存状态一致性问题。
+
+缺陷4：当后端存储为HBase时，导入性能还有待提升。
+
+
+
+混合索引：
+
+indexBuilder = mgmt.buildIndex("call_content_index", Edge.class)
+indexBuilder.indexOnly(mgmt.getEdgeLabel("CALL"))
+indexBuilder.unique();
+indexBuilder.addKey(mgmt.getPropertyKey("content"), Mapping.STRING.asParameter())
+indexBuilder.buildMixedIndex("search")
+
+精准索引：
+
+indexBuilder = mgmt.buildIndex("test_set_index", Vertex.class)
+indexBuilder.indexOnly(mgmt.getVertexLabel("Customer"))
+indexBuilder.unique();
+indexBuilder.addKey(mgmt.getPropertyKey("test_set"));
+indexBuilder.buildCompositeIndex();
+
+
+
+
+g.E().has('hash', hash).profile()
+g.V(marko).repeat(out()).times(2).values('name')
+

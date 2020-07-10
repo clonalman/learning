@@ -1,0 +1,104 @@
+官网说明：
+-----------------------------------------------------------------------------------------------------------
+elasticsearch官网建议生产环境需要设置bootstrap.memory_lock: true
+
+官网的解释 是：发生系统swapping的时候ES节点的性能会非常差，也会影响节点的稳定性。所以要不惜一切代价来避免swapping。swapping会导致Java GC的周期延迟从毫秒级恶化到分钟，更严重的是会引起节点响应延迟甚至脱离集群。
+
+所以最好限制住elasticsearch占用的内存情况，可选少用swap
+
+
+错误内容：
+-----------------------------------------------------------------------------------------------------------
+开启bootstrap.memory_lock: true后，在Elasticsearch集群启动的时候，会报如下错误
+
+ERROR: bootstrap checks failed memory locking requested for elasticsearch process but memory is not locked
+
+
+解决方法：
+-----------------------------------------------------------------------------------------------------------
+1、方案1
+vim /etc/security/limits.conf
+
+* soft memlock unlimited
+* hard memlock unlimited
+
+/etc/sysctl.conf 
+
+vm.swappiness=0
+
+sysctl -p
+
+2、方案2
+
+vim /etc/systemd/system.conf
+
+DefaultLimitNOFILE=65536
+DefaultLimitNPROC=32000
+DefaultLimitMEMLOCK=infinity
+
+
+============================================================================================================
+错误内容：
+max number of threads [2048] for user [*] is too low, increase to at least [4096]
+-----------------------------------------------------------------------------------------------------------
+
+vim /etc/security/limits.d/test-limits.conf
+============================================================================================================
+
+错误内容：
+-----------------------------------------------------------------------------------------------------------
+system call filters failed to install; check the logs and fix your configuration or disable system call filters at your own risk
+
+解决：
+Centos6不支持SecComp，而ES5.2.0默认bootstrap.system_call_filter为true
+
+禁用：在elasticsearch.yml中配置bootstrap.system_call_filter为false，注意要在Memory下面:
+bootstrap.memory_lock: false
+bootstrap.system_call_filter: false
+
+============================================================================================================
+
+插件：
+
+elasticsearch-head:
+
+vim elasticsearch-head/Gruntfile.js
+
+grunt.initConfig:
+
+connect: {
+  server: {
+    options: {
+      hostname: '*',
+      port: 9100,
+      base: '.',
+      keepalive: true
+    }
+  }
+}
+
+vim elasticsearch-head/_site/app.js
+
+节点配置：
+
+cluster.name: my-application
+node.name: node-172-17-115-125
+path.data: /opt/elasticsearch/data/data
+path.logs: /opt/elasticsearch/data//logs
+bootstrap.memory_lock: false
+bootstrap.system_call_filter: false
+network.host: 172.17.115.125
+http.port: 9200
+discovery.zen.ping.unicast.hosts: ["172.17.115.125:9300","172.17.115.124:9300","172.17.115.126:9300"]
+discovery.zen.minimum_master_nodes: 2
+gateway.recover_after_nodes: 3
+node.master: true
+node.data: false
+node.ingest: false
+search.remote.connect: false
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+
+
+节点检测：
+curl http://172.17.115.124:9200/_cat/nodes?v

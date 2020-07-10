@@ -1,0 +1,7 @@
+readGraph = GraphFactory.open('conf/hadoop-graph/hadoop-load-json.properties')
+writeGraphConf = new BaseConfiguration()
+writeGraphConf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph")
+writeGraphConf.setProperty("gremlin.tinkergraph.graphFormat", "gryo")
+writeGraphConf.setProperty("gremlin.tinkergraph.graphLocation", "/tmp/csv-graph.kryo")
+blvp = BulkLoaderVertexProgram.build().bulkLoader(OneTimeBulkLoader).writeGraph(writeGraphConf).create(readGraph)
+readGraph.compute(SparkGraphComputer).workers(1).program(blvp).submit().get()

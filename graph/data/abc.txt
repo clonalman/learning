@@ -1,0 +1,5 @@
+indexBuilder = mgmt.buildIndex("test_set_index", Vertex.class)
+indexBuilder.indexOnly(mgmt.getVertexLabel("Customer"))
+indexBuilder.unique();
+indexBuilder.addKey(mgmt.getPropertyKey("test_set"));
+indexBuilder.buildCompositeIndex();
