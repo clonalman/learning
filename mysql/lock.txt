@@ -1,0 +1,28 @@
+
+mysql查看被锁住的表
+ 
+查询是否锁表
+show OPEN TABLES where In_use > 0;
+查看所有进程
+MySQL:
+ 
+show processlist;
+mariabd:
+ 
+show full processlist;
+查询到相对应的进程===然后 kill id
+ 
+杀掉指定mysql连接的进程号
+kill $pid
+查看正在锁的事务
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS; 
+查看等待锁的事务
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS; 
+查看innodb引擎的运行时信息
+show engine innodb status\G;
+查看造成死锁的sql语句，分析索引情况，然后优化sql语句；
+ 
+查看服务器状态
+show status like '%lock%';
+查看超时时间：
+show variables like '%timeout%'

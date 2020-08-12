@@ -1,0 +1,3 @@
+autotools系列工具：aclocal,autoscan,autoconf,autoheader,automake
+
+yum install autotools-dev m4 autoconf2.13 autobook autoconf-archive gnu-standards autoconf-doc libtool

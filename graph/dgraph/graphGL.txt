@@ -1,0 +1,16 @@
+1¡¢uid¹ıÂË
+{
+   q(func: uid(0x222d1bc)){
+     uid
+     expand(all)
+   }
+}
+
+2¡¢term¹ıÂË
+
+{
+   q(func: anyofterms(0x222d1bc)){
+     uid
+     expand(all)
+   }
+}
