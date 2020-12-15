@@ -1,50 +1,39 @@
-浪潮：
-https://www.tdata.cn/operate/qpx/index.html
-https://www.inspur.com/lcjtww/2533283/2533284/2533317/index.html
-https://cloud.inspur.com/market/Data/appcontent/index/id/553062424.html
-
-
-
-https://cloud.tencent.com/document/product/1061
-https://zhuanlan.zhihu.com/p/250505226
-
-合合信息：
-https://www.intsig.com/graph/mkt.shtml
-
-
-企业风险全息画像&实时监控平台：
-http://nscc.hnu.edu.cn/info/1063/1122.htm
-
-
-文章：
+企业画像新闻与文章
+http://sh.eastday.com/m/20171112/u1ai10991569.html
 http://news.jstv.com/a/20201118/5b368c188d1746c0873345225d27aa13.shtml
 https://www.yicai.com/news/100242729.html
 http://sh.people.com.cn/n2/2017/1112/c134768-30913380.html
 http://sh.eastday.com/m/20171112/u1ai10991569.html
+http://nscc.hnu.edu.cn/info/1063/1122.htm
+https://cloud.tencent.com/document/product/1061
+https://www.inspur.com/lcjtww/2533283/2533284/2533317/index.html
 
-
-系统：
-https://www.sensorsdata.cn/product/userTag.html
-http://www.efindata.com/Home/Holographic
-
-https://www.higgscredit.com/#/
-https://map.higgscredit.com/#/
+数据：
+https://www.tdata.cn/operate/qpx/index.html （数据与API）
+https://data.aliyun.com/solution/cds?spm=a2c6h.12873639.0.0.4a783fc62PKPb0 （数据与服务）
 https://developer.aliyun.com/article/60554
-https://data.aliyun.com/solution/cds?spm=a2c6h.12873639.0.0.4a783fc62PKPb0
+https://map.higgscredit.com/#/
+https://cloud.inspur.com/market/Data/appcontent/index/id/553062424.html
 
-招投标数据：
-https://help.cbi360.net/1015/42.html
-
-
-界面：
+分析：
 https://baijiahao.baidu.com/s?id=1594141083999253585&wfr=spider&for=pc
 
 
 产品：
-http://zkdj.com/zhaoshang/
+http://zkdj.com/zhaoshang/ （政府招商）
 https://www.sohu.com/a/436981221_313745（营销获客）
+https://help.cbi360.net/1015/42.html （建筑行业招投标）
+https://www.sensorsdata.cn/product/userTag.html （用户画像）
+https://www.intsig.com/graph/mkt.shtml （营销获客）
+
+
+实现：
+https://zhuanlan.zhihu.com/p/250505226
+
+
+应用：
+
+信评、营销、监控（舆情、风控）、政府监管
 
 
 
-
-营销、舆情
