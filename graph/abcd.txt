@@ -1,0 +1,5 @@
+https://github.com/xebialabs-community/xld-mongodb-plugin.git
+
+
+1.官方方案：在mongodb的文档类型中加字段,存分词结果,然后从该字段中匹配。
+2.lucene+IKAnalyzer：lucene 把大文本的数据 利用分词器 在新建的索引文件中建立索引取数据的时候从索引文件中取出mongodb 中的数据进行 索引的创建

@@ -1,0 +1,5 @@
+<dependency>
+    <groupId>org.apache.lucene</groupId>
+    <artifactId>lucene-analyzers-smartcn</artifactId>
+    <version>8.7.0</version>
+</dependency>
