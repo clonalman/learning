@@ -15,21 +15,28 @@ https://developer.aliyun.com/article/60554
 https://map.higgscredit.com/#/
 https://cloud.inspur.com/market/Data/appcontent/index/id/553062424.html
 
+https://open.tianyancha.com/(天眼查开发平台)
+
 分析：
 https://baijiahao.baidu.com/s?id=1594141083999253585&wfr=spider&for=pc
 
 
-产品：
+产品介绍：
 http://zkdj.com/zhaoshang/ （政府招商）
 https://www.sohu.com/a/436981221_313745（营销获客）
 https://help.cbi360.net/1015/42.html （建筑行业招投标）
 https://www.sensorsdata.cn/product/userTag.html （用户画像）
 https://www.intsig.com/graph/mkt.shtml （营销获客）
+http://www.trs.com.cn/cphfw/zndsj/
+https://www.ithome.com/0/515/030.htm
 
 
 实现：
 https://zhuanlan.zhihu.com/p/250505226
+https://www.skytech.cn/article/7053.html
 
+
+https://github.com/Bil369/YiQi-ZombieCompanyClassifier
 
 应用：
 
