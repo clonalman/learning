@@ -56,10 +56,15 @@ for index, row in qdf.iterrows():
     rts.redis.hset(key + ":" + str(tick), 'ts', ts, data.to_dict())
 
 key = 'security:0:000635:20220617'
-rng = rts.range(key,
-                int(datetime(2022, 6, 17).timestamp() * 1000),
-                int(datetime(2022, 6, 18).timestamp() * 1000))
-print(rng)
+s_dt = datetime(2022, 6, 17)
+e_dt = datetime(2022, 6, 18)
+print('=========================================')
+print(key + "\t" + str(s_dt) + "\t" + str(e_dt))
+print('-----------------------------------------')
 
+rng = rts.range(key, int(s_dt.timestamp() * 1000), int(e_dt.timestamp() * 1000))
+print(rng)
+print('-----------------------------------------')
 rdf = pd.DataFrame([rts.redis.hgetall(key + ":" + str(int(tick))) for ts, tick in rng])
 print(rdf)
+
