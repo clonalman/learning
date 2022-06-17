@@ -1,7 +1,3 @@
-from collections import defaultdict
-from functools import reduce
-from typing import Mapping
-
 from rediscluster import RedisCluster
 from redistimeseries.client import Client
 from datetime import datetime
@@ -18,14 +14,15 @@ import pandas as pd
 # ]
 
 nodes = [
-    {'host': '192.168.1.12', 'port': 7001},
-    {'host': '192.168.1.12', 'port': 7002},
-    {'host': '192.168.1.12', 'port': 7003},
-    {'host': '192.168.1.12', 'port': 7004},
-    {'host': '192.168.1.12', 'port': 7005},
-    {'host': '192.168.1.12', 'port': 7006}
+    {'host': '47.92.239.29', 'port': 7001},
+    {'host': '47.92.239.29', 'port': 7002},
+    {'host': '47.92.239.29', 'port': 7003},
+    {'host': '47.92.239.29', 'port': 7004},
+    {'host': '47.92.239.29', 'port': 7005},
+    {'host': '47.92.239.29', 'port': 7006}
 ]
 
+# skip_full_coverage_check=True
 conn = RedisCluster(startup_nodes=nodes, decode_responses=True)
 print(conn)
 
@@ -55,9 +52,9 @@ for index, row in qdf.iterrows():
     rts.add(key, ts, tick)
     rts.redis.hset(key + ":" + str(tick), 'ts', ts, data.to_dict())
 
-key = 'security:0:000635:20220617'
-s_dt = datetime(2022, 6, 17)
-e_dt = datetime(2022, 6, 18)
+key = 'security:0:000635:'+datetime.now().strftime("%Y%m%d")
+s_dt = datetime(2022, 6, 18)
+e_dt = datetime(2022, 6, 19)
 print('=========================================')
 print(key + "\t" + str(s_dt) + "\t" + str(e_dt))
 print('-----------------------------------------')
