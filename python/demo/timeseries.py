@@ -1,72 +1,79 @@
 from rediscluster import RedisCluster
 from redistimeseries.client import Client
-from datetime import datetime
+from datetime import datetime, timedelta
+from pandas import DataFrame
 import mootdx_std as tdx
-import pandas as pd
 
-# nodes = [
-#     {'host': '172.27.175.4', 'port': 7001},
-#     {'host': '172.27.175.4', 'port': 7002},
-#     {'host': '172.27.175.4', 'port': 7003},
-#     {'host': '172.27.175.4', 'port': 7004},
-#     {'host': '172.27.175.4', 'port': 7005},
-#     {'host': '172.27.175.4', 'port': 7006},
-# ]
 
-nodes = [
-    {'host': '47.92.239.29', 'port': 7001},
-    {'host': '47.92.239.29', 'port': 7002},
-    {'host': '47.92.239.29', 'port': 7003},
-    {'host': '47.92.239.29', 'port': 7004},
-    {'host': '47.92.239.29', 'port': 7005},
-    {'host': '47.92.239.29', 'port': 7006}
-]
+def save_cache(client: Client, df: DataFrame, cols=None, rename=None):
+    for index, row in df.iterrows():
+        dt = datetime.combine(cur_date, datetime.strptime(row["servertime"], '%H:%M:%S.%f').time())
+        key = 'security:' + str(row['market']) + ':' + str(row['code']) + ':' + cur_date.strftime('%Y%m%d')
+        if not client.redis.exists(key):
+            labels = {'market': row['market'], 'code': row['code'], 'date': cur_date.strftime('%Y%m%d')}
+            client.create(key, labels=labels, retention_msecs=432000000, duplicate_policy='last')
+        tick = row['active1']
 
-# skip_full_coverage_check=True
-conn = RedisCluster(startup_nodes=nodes, decode_responses=True)
-print(conn)
+        if cols is not None:
+            row = row[cols]
 
-rts = Client(conn=conn)
+        if rename is not None:
+            row = row.rename(rename)
 
-qdf = tdx.quotes(['300033', '600745', '000635'])
-# print(qdf)
+        ts = int(dt.timestamp() * 1000)
+        client.add(key, ts, tick)
+        client.redis.hset(key + ":" + str(tick), 'ts', ts, row.to_dict())
 
-columns = [
-    'open', 'last_close', 'high', 'low', 'price', 'amount', 'volume', 's_vol', 'b_vol',
-    'ask1', 'ask2', 'ask3', 'ask4', 'ask5', 'ask_vol1', 'ask_vol2', 'ask_vol3', 'ask_vol4', 'ask_vol5',
-    'bid1', 'bid2', 'bid3', 'bid4', 'bid5', 'bid_vol1', 'bid_vol2', 'bid_vol3', 'bid_vol4', 'bid_vol5'
-]
 
-for index, row in qdf.iterrows():
-    dt = datetime.combine(datetime.now().date(), datetime.strptime(row["servertime"], '%H:%M:%S.%f').time())
-    cur_date = dt.date().strftime('%Y%m%d')
-    key = 'security:' + str(row['market']) + ':' + str(row['code']) + ':' + cur_date
+if __name__ == '__main__':
+    nodes = [
+        {'host': '47.92.239.29', 'port': 7001},
+        {'host': '47.92.239.29', 'port': 7002},
+        {'host': '47.92.239.29', 'port': 7003},
+        {'host': '47.92.239.29', 'port': 7004},
+        {'host': '47.92.239.29', 'port': 7005},
+        {'host': '47.92.239.29', 'port': 7006}
+    ]
+    conn = RedisCluster(startup_nodes=nodes, decode_responses=True)
+    print(conn)
 
-    if not rts.redis.exists(key):
-        rts.create(key, labels={'market': row['market'], 'code': row['code'], 'date': cur_date},
-                   retention_msecs=432000000, duplicate_policy='last')
-    tick = row['active1']
-    data = row[columns].rename({'last_close': 'close'})
+    rts = Client(conn=conn)
 
-    ts = int(dt.timestamp() * 1000)
-    rts.add(key, ts, tick)
-    rts.redis.hset(key + ":" + str(tick), 'ts', ts, data.to_dict())
+    cur_date = datetime(2022, 6, 17).date()
+    # 实时分时行情
+    qdf = tdx.quotes(['300033', '600745', '000635'])
+    # 历史分时行情
+    # qdf = tdx.minutes('300033', cur_date.strftime('%Y%m%d'))
+    # 历史分笔
+    # qdf = tdx.transactions('300033', cur_date.strftime('%Y%m%d'))
 
-key = 'security:0:000635:'+datetime.now().strftime("%Y%m%d")
-s_dt = datetime(2022, 6, 18)
-e_dt = datetime(2022, 6, 19)
-print('=========================================')
-print(key + "\t" + str(s_dt) + "\t" + str(e_dt))
-print('-----------------------------------------')
+    print(qdf)
 
-rng = rts.range(key, int(s_dt.timestamp() * 1000), int(e_dt.timestamp() * 1000))
-print(rng)
-print('-----------------------------------------')
+    if qdf is not None:
+        columns = [
+            'open', 'last_close', 'high', 'low', 'price', 'amount', 'volume', 's_vol', 'b_vol',
+            'ask1', 'ask2', 'ask3', 'ask4', 'ask5', 'ask_vol1', 'ask_vol2', 'ask_vol3', 'ask_vol4', 'ask_vol5',
+            'bid1', 'bid2', 'bid3', 'bid4', 'bid5', 'bid_vol1', 'bid_vol2', 'bid_vol3', 'bid_vol4', 'bid_vol5'
+        ]
 
-rdf = pd.DataFrame([rts.redis.hgetall(key + ":" + str(int(tick))) for ts, tick in rng])
-print(rdf)
+        save_cache(rts, qdf, columns, {'last_close': 'close'})
+
+        test_key = 'security:0:000635:' + cur_date.strftime("%Y%m%d")
+        start_dt = datetime(cur_date)
+        end_dt = start_dt + timedelta(days=1)
+        print('=========================================')
+        print(test_key + "\t" + str(start_dt) + "\t" + str(end_dt))
+        print('-----------------------------------------')
+
+        rng = rts.range(test_key, int(start_dt.timestamp() * 1000), int(end_dt.timestamp() * 1000))
+        print(rng)
+        print('-----------------------------------------')
+
+        rdf = DataFrame([rts.redis.hgetall(test_key + ":" + str(int(tick))) for ts, tick in rng])
+        print(rdf)
 
 # Connected to pydev debugger (build 212.5457.46)
+
 # RedisCluster<
 # 192.168.1.12:7001, 192.168.1.12:7002, 192.168.1.12:7003, 192.168.1.12:7004, 192.168.1.12:7005, 192.168.1.12:7006
 # >
