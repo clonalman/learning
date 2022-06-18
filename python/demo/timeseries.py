@@ -1,6 +1,6 @@
 from rediscluster import RedisCluster
 from redistimeseries.client import Client
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from pandas import DataFrame
 import mootdx_std as tdx
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         save_cache(rts, qdf, columns, {'last_close': 'close'})
 
         test_key = 'security:0:000635:' + cur_date.strftime("%Y%m%d")
-        start_dt = datetime(cur_date)
+        start_dt = datetime.combine(cur_date, time(0, 0, 0))
         end_dt = start_dt + timedelta(days=1)
         print('=========================================')
         print(test_key + "\t" + str(start_dt) + "\t" + str(end_dt))
