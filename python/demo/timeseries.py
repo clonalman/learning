@@ -1,16 +1,16 @@
 from rediscluster import RedisCluster
 from redistimeseries.client import Client
-from datetime import datetime, time, timedelta
+from datetime import datetime, date, time, timedelta
 from pandas import DataFrame
 import mootdx_std as tdx
 
 
-def save_cache(client: Client, df: DataFrame, cols=None, rename=None):
-    for index, row in df.iterrows():
-        dt = datetime.combine(cur_date, datetime.strptime(row["servertime"], '%H:%M:%S.%f').time())
-        key = 'security:' + str(row['market']) + ':' + str(row['code']) + ':' + cur_date.strftime('%Y%m%d')
+def save_cache(client: Client, df: DataFrame, cur_dt: date, cols=None, rename=None):
+    for i, row in df.iterrows():
+        dt = datetime.combine(cur_dt, datetime.strptime(row["servertime"], '%H:%M:%S.%f').time())
+        key = 'security:' + str(row['market']) + ':' + str(row['code']) + ':' + cur_dt.strftime('%Y%m%d')
         if not client.redis.exists(key):
-            labels = {'market': row['market'], 'code': row['code'], 'date': cur_date.strftime('%Y%m%d')}
+            labels = {'market': row['market'], 'code': row['code'], 'date': cur_dt.strftime('%Y%m%d')}
             client.create(key, labels=labels, retention_msecs=432000000, duplicate_policy='last')
         tick = row['active1']
 
@@ -56,7 +56,7 @@ if __name__ == '__main__':
             'bid1', 'bid2', 'bid3', 'bid4', 'bid5', 'bid_vol1', 'bid_vol2', 'bid_vol3', 'bid_vol4', 'bid_vol5'
         ]
 
-        save_cache(rts, qdf, columns, {'last_close': 'close'})
+        save_cache(rts, qdf, cur_date, columns, {'last_close': 'close'})
 
         test_key = 'security:0:000635:' + cur_date.strftime("%Y%m%d")
         start_dt = datetime.combine(cur_date, time(0, 0, 0))
