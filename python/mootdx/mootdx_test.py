@@ -1,11 +1,35 @@
+import json
+import os
 from datetime import datetime, time, timedelta
 from pandas import DataFrame
 from mootdx_rts import MootdxRTS
 
-if __name__ == '__main__':
 
-    std = MootdxRTS.std()
-    cur_date = datetime(2022, 6, 17).date()
+def printStocks(std, cur_date):
+    stock_path = 'market/' + cur_date.strftime("%Y%m%d")
+    if not os.path.exists(stock_path):
+        os.makedirs(stock_path)
+
+    astocks = []
+    for market in [0, 1]:
+        qdf = std.stocks(market)
+        rows = []
+        for i, row in qdf.iterrows():
+            item = row.to_dict()
+            # 债券：900
+            if item['code'].startswith(('600', '601', '603', '688', '000', '002', '300')):
+                astocks.append(item)
+            rows.append(item)
+
+        with open(stock_path + '/stocks.' + str(market) + '.json', 'w', encoding='utf-8') as f:
+            f.write(json.dumps(rows, ensure_ascii=False))
+
+    print("A股: " + str(len(astocks)))
+    with open(stock_path + '/stocks.a.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(astocks, ensure_ascii=False))
+
+
+def printQuotes(std, cur_date):
     # 实时分时行情
     qdf = std.quotes(['300033', '600745', '000635'])
     # 历史分时行情
@@ -31,6 +55,13 @@ if __name__ == '__main__':
 
         rdf = DataFrame([std.rtsCli.redis.hgetall(test_key + ":" + str(int(tick))) for ts, tick in rng])
         print(rdf)
+
+
+if __name__ == '__main__':
+    std = MootdxRTS.std()
+    cdt = datetime(2022, 6, 17).date()
+    printStocks(std, cdt)
+    printQuotes(std, cdt)
 
 
 # Connected to pydev debugger (build 212.5457.46)
