@@ -16,7 +16,7 @@ if __name__ == '__main__':
     print(qdf)
 
     if qdf is not None:
-        std.saveToRts(qdf, cur_date)
+        std.save(cur_date, qdf)
 
         test_key = 'security:0:000635:' + cur_date.strftime("%Y%m%d")
         start_dt = datetime.combine(cur_date, time(0, 0, 0))

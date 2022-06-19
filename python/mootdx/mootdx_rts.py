@@ -57,7 +57,7 @@ class MootdxCli(object):
         # 当前分笔
         self.tdxCli.transactions(symbol=symbol, date=date, start=start, offset=offset)
 
-    def saveToRts(self, df: DataFrame, cur_dt: date):
+    def save(self, cur_dt: date, df: DataFrame):
         for i, row in df.iterrows():
             dt = datetime.combine(cur_dt, datetime.strptime(row["servertime"], '%H:%M:%S.%f').time())
             key = 'security:' + str(row['market']) + ':' + str(row['code']) + ':' + cur_dt.strftime('%Y%m%d')
@@ -71,4 +71,4 @@ class MootdxCli(object):
             ts = int(dt.timestamp() * 1000)
             self.rtsCli.add(key, ts, tick)
             self.rtsCli.redis.hset(key + ":" + str(tick), 'ts', ts, row.to_dict())
-            self.rtsCli.redis.publish("security", key)
+            # self.rtsCli.redis.publish("security", key)
