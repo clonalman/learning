@@ -37,7 +37,6 @@ class MootdxCli(object):
     def stocks(self, market):
         return self.tdxCli.stocks(market=market)
 
-
     def quotes(self, symbol):
         # 实时行情
         return self.tdxCli.quotes(symbol=symbol)
@@ -61,8 +60,6 @@ class MootdxCli(object):
     def transactions(self, symbol, date, start=0, offset=10):
         # 当前分笔
         self.tdxCli.transactions(symbol=symbol, date=date, start=start, offset=offset)
-
-
 
     def save(self, cur_dt: date, df: DataFrame):
         for i, row in df.iterrows():
