@@ -1,33 +1,29 @@
 import json
 import os
+import sys
 from datetime import datetime
-from mootdx_rts import MootdxRTS
+from mootdx_rts import MootdxRTS, make_pid, kill_pid
 
 
 def fetch(std, cur_date):
-    stock_path = 'market/' + cur_date.strftime("%Y%m%d")
-    if not os.path.exists(stock_path):
-        os.makedirs(stock_path)
+    if not os.path.exists('market'):
+        os.makedirs('market')
 
-    astocks = []
+    stocks_all = []
     for market in [0, 1]:
         qdf = std.stocks(market)
-        rows = []
         for i, row in qdf.iterrows():
-            item = row.to_dict()
-            # 债券：900
-            if item['code'].startswith(('600', '601', '603', '688', '000', '002', '300')):
-                astocks.append(item)
-            rows.append(item)
+            stocks_all.append(row.to_dict())
 
-        with open(stock_path + '/stocks.' + str(market) + '.json', 'w', encoding='utf-8') as f:
-            f.write(json.dumps(rows, ensure_ascii=False))
+    with open(sys.path[0] + '/market/stocks.' + cur_date.strftime("%Y%m%d") + '.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(stocks_all, ensure_ascii=False))
+    with open(sys.path[0] + '/market/stocks.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(stocks_all, ensure_ascii=False))
 
-    print("A股: " + str(len(astocks)))
-
-    with open('market/stocks.a.json', 'w', encoding='utf-8') as f:
-        f.write(json.dumps(astocks, ensure_ascii=False))
+    print("通达信全市场指数量: " + str(len(stocks_all)))
 
 
 if __name__ == '__main__':
+    make_pid('mootdx_stocks')
     fetch(MootdxRTS.std(), datetime.now().date())
+    kill_pid('mootdx_stocks')

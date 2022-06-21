@@ -1,3 +1,5 @@
+import sys
+
 from rediscluster import RedisCluster
 from redistimeseries.client import Client
 from datetime import datetime, date
@@ -5,12 +7,25 @@ from pandas import DataFrame
 from mootdx.quotes import Quotes
 from mootdx import consts
 import json
+import os
+
+
+def make_pid(name):
+    if not os.path.exists(sys.path[0] + '/pids'):
+        os.makedirs(sys.path[0] + '/pids')
+    with open(sys.path[0] + '/pids/' + name + '.pid', 'w', encoding='utf-8') as f:
+        f.write(str(os.getpid()))
+
+
+def kill_pid(name):
+    with open(sys.path[0] + '/pids/' + name + '.pid', encoding='utf-8') as f:
+        os.kill(int(f.readline(16)), 9)
 
 
 class MootdxRTS(object):
     @staticmethod
     def std():
-        with open('redis-cluster.json') as f:
+        with open(sys.path[0]+'/redis-cluster.json') as f:
             nodes = json.load(f)
             print(nodes)
             redis_cli = RedisCluster(startup_nodes=nodes, decode_responses=True)
