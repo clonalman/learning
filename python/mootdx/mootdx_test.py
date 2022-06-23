@@ -8,8 +8,11 @@ from mootdx_rts import MootdxRTS
 import mootdx_quotes
 import mootdx_stocks
 
-def printQuotes(std, code, cur_date):
-    test_key = 'security:0:'+ code +':' + cur_date.strftime("%Y%m%d")
+
+def printQuotes(std, market, code, cur_date):
+    test_key = 'SECU:' + str(market) + ':' + code + ':' + cur_date.strftime("%Y%m%d")
+    print('=========================================')
+    print(std.quotes(code))
     start_dt = datetime.combine(cur_date, time(0, 0, 0))
     end_dt = start_dt + timedelta(days=1)
     print('=========================================')
@@ -20,13 +23,14 @@ def printQuotes(std, code, cur_date):
     print(rng)
     print('-----------------------------------------')
 
-    rdf = DataFrame([std.rtsCli.redis.hgetall(test_key + ":" + str(int(tick))) for ts, tick in rng])
-    print(rdf)
+    # if rng is not None:
+    #     rdf = DataFrame([std.rtsCli.redis.hgetall(test_key + ":" + str(int(tick))) for ts, tick in rng])
+    #     print(rdf)
 
 
 if __name__ == '__main__':
-    # std = MootdxRTS.std()
-    # today = datetime(2022, 6, 21).date()
+    std = MootdxRTS.std()
+    today = datetime(2022, 6, 23).date()
     # mootdx_stocks.fetch(std, today)
-    # printQuotes(std, '002955', today)
-    print(mootdx_quotes.get_stock_symbols())
+    printQuotes(std, 0, '300033', today)
+    # print(mootdx_quotes.get_stock_symbols())

@@ -4,29 +4,46 @@ import threading
 import time
 import traceback
 from datetime import datetime
+
+from pytdx.parser.base import ResponseHeaderRecvFails, ResponseRecvFails
+
 from mootdx_rts import MootdxRTS, make_pid
 
 
 def run(std, symbols):
     # 实时分时行情
     num = 0
+    print("Batch symbols: " + str(len(symbols)))
+
     while num < len(symbols):
+        start_dt = datetime.now()
         try:
             items = symbols[num:num + 80]
             print(items)
+            num = num + 80
             qdf = std.quotes(items)
-            time.sleep(0.05)
             if qdf is not None:
                 std.save(datetime.now().date(), qdf)
-            num += 80
-        except ConnectionError:
+            end_dt = datetime.now()
+            print('cost: %dms' % ((end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
+        except (ConnectionAbortedError,
+                ConnectionRefusedError,
+                ConnectionResetError,
+                ResponseRecvFails,
+                ResponseHeaderRecvFails):
             traceback.print_exc()
+            end_dt = datetime.now()
+            print('cost: %dms(error)' % ((end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
             std = MootdxRTS.std()
+            time.sleep(1)
         except Exception:
             traceback.print_exc()
+            end_dt = datetime.now()
+            print('cost: %dms(exception)' % (
+                        (end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
             time.sleep(1)
 
-    r_t01 = threading.Timer(10, run, args=(std, symbols,))
+    r_t01 = threading.Timer(0.2, run, args=(std, symbols,))
     r_t01.start()
 
 
@@ -41,26 +58,26 @@ def get_stock_symbols():
             for stock in json_stocks:
                 if stock['code'].startswith(tuple(json_symbols)):
                     result.append(stock['code'])
+    print("Total symbols: " + str(len(result)))
+    print("====================================")
+    print(result)
+    print("====================================")
     return result
 
 
 if __name__ == '__main__':
-    # print("sys.path[0] =", sys.path[0])
-    # print("sys.argv[0] =", sys.argv[0])
-    # print("__file__ =", __file__)
-    # print("os.path.abspath(__file__) =", os.path.abspath(__file__))
-    # print("os.path.realpath(__file__) = ", os.path.realpath(__file__))
-    # print("os.path.dirname(os.path.realpath(__file__)) =", os.path.dirname(os.path.realpath(__file__)))
-    # print("os.path.split(os.path.realpath(__file__)) =", os.path.split(os.path.realpath(__file__)))
-    # print("os.getcwd() =", os.getcwd())
-
     make_pid('mootdx_quotes')
-    symbols = get_stock_symbols()
-    total = len(symbols)
+
+    thread_list = []
+    thread_size = 5
+
+    stock_symbols = get_stock_symbols()
+    total = len(stock_symbols)
     batch = 0
-    batch_size = int(total / 10)
+    batch_size = int(total / thread_size) + 1
     while batch < total:
         std = MootdxRTS.std()
-        t01 = threading.Thread(target=run, args=(std, symbols[batch:batch + batch_size]))
+        t01 = threading.Thread(target=run, args=(std, stock_symbols[batch:batch+batch_size]))
+        thread_list.append(t01)
         t01.start()
         batch += batch_size

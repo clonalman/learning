@@ -24,6 +24,7 @@ def fetch(std, cur_date):
 
 
 if __name__ == '__main__':
+    # ["600", "601", "603", "688"]
     make_pid('mootdx_stocks')
     fetch(MootdxRTS.std(), datetime.now().date())
     kill_pid('mootdx_stocks')
