@@ -19,19 +19,20 @@ def get_stock_symbols():
             for stock in json_stocks:
                 if stock['code'].startswith(tuple(json_symbols)):
                     result.append(stock['code'])
-    print("Total symbols:", len(result), 'Now:', time.strftime('%H:%M:%S', time.localtime()))
-    print("====================================")
+    print('Now:', time.strftime('%H:%M:%S', time.localtime()), "Thread:", threading.current_thread().ident, "Total symbols:", len(result))
+    print("================================")
     return result
 
 
 def createTimer(std, symbols):
-    t = threading.Timer(0.2, repeat, args=(std, symbols,))
-    t.start()
+    global thread
+    thread = threading.Timer(0.2, repeat, args=(std, symbols,))
+    thread.start()
 
 
 def repeat(std, symbols):
-    print('Now:', time.strftime('%H:%M:%S', time.localtime()), "Symbols:", len(symbols))
-    print("------------------------------------")
+    print('Now:', time.strftime('%H:%M:%S', time.localtime()), "Thread:", threading.current_thread().ident, "Symbols:", len(symbols))
+    print("--------------------------------")
     # 实时分时行情
     num = 0
     while num < len(symbols):
@@ -45,8 +46,7 @@ def repeat(std, symbols):
 
             end_dt = datetime.now()
             num = num + 80
-            print('Now:', time.strftime('%H:%M:%S', time.localtime()),
-                  'cost:', '%dms' % ((end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
+            print('cost: %dms' % ((end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
         except (ConnectionAbortedError,
                 ConnectionRefusedError,
                 ConnectionResetError,
@@ -54,15 +54,14 @@ def repeat(std, symbols):
                 ResponseHeaderRecvFails):
             traceback.print_exc()
             end_dt = datetime.now()
-            print('Now:', time.strftime('%H:%M:%S', time.localtime()),
-                  'cost:', '%dms(error)' % ((end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
+            print('cost: %dms(error)' % ((end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
             std = MootdxRTS.std()
             time.sleep(1)
         except Exception:
             traceback.print_exc()
             end_dt = datetime.now()
-            print('Now:', time.strftime('%H:%M:%S', time.localtime()),
-                  'cost:', '%dms(exception)' % ((end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
+            print('cost: %dms(exception)' % (
+                    (end_dt - start_dt).seconds * 1000 + (end_dt - start_dt).microseconds / 1000))
             time.sleep(1)
 
     createTimer(std, symbols)
@@ -71,7 +70,7 @@ def repeat(std, symbols):
 if __name__ == '__main__':
     make_pid('mootdx_quotes')
 
-    num_timer = 5
+    num_timer = 7
 
     stock_symbols = get_stock_symbols()
     total = len(stock_symbols)

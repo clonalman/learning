@@ -81,24 +81,29 @@ class MootdxCli(object):
 
     def save(self, cur_dt: date, df: DataFrame):
         retention_msecs = 604800000
+        rows = []
         for i, row in df.iterrows():
             dt = datetime.combine(cur_dt, datetime.strptime(row["servertime"], '%H:%M:%S.%f').time())
             key = 'SECU:' + str(row['market']) + ':' + str(row['code']) + ':' + cur_dt.strftime('%Y%m%d')
-            if not self.rtsCli.redis.exists(key):
-                labels = {'market': row['market'], 'code': row['code'], 'date': cur_dt.strftime('%Y%m%d')}
-                self.rtsCli.create(key, labels=labels, retention_msecs=retention_msecs, duplicate_policy='last')
-            tick = row['active1']
+            labels = {'market': row['market'], 'code': row['code'], 'date': cur_dt.strftime('%Y%m%d')}
 
+            # if not self.redisCli.exists(key):
+            #     labels = {'market': row['market'], 'code': row['code'], 'date': cur_dt.strftime('%Y%m%d')}
+            #     self.rtsCli.create(key, labels=labels, retention_msecs=retention_msecs, duplicate_policy='last')
+
+            tick = row['active1']
             row = row[self.__columns].rename(self.__renames)
 
             ts = int(dt.timestamp() * 1000)
             key_tick = key + ":" + str(tick)
 
-            dic = {'ts': ts}
+            dic = {'ts': ts }
             dic.update(row.to_dict())
 
-            self.rtsCli.add(key, ts, tick, retention_msecs=retention_msecs, duplicate_policy='last')
+            self.rtsCli.add(key, ts, tick, labels=labels, retention_msecs=retention_msecs, duplicate_policy='last')
             self.rtsCli.redis.hset(key_tick, mapping=dic)
             self.rtsCli.redis.pexpire(key_tick, retention_msecs)
-            self.redisCli.publish("security", json.dumps(dic))
+            rows.append(dic)
+
         self.rtsCli.redis.execute()
+        self.redisCli.publish("security", json.dumps(rows))
