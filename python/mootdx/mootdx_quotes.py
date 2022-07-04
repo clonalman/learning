@@ -20,19 +20,19 @@ def get_stock_symbols():
                 if stock['code'].startswith(tuple(json_symbols)):
                     result.append(stock['code'])
     print('Now:', time.strftime('%H:%M:%S', time.localtime()), "Thread:", threading.current_thread().ident, "Total symbols:", len(result))
-    print("================================")
+    print("==============================================")
     return result
 
 
 def createTimer(std, symbols):
     global thread
-    thread = threading.Timer(0.2, repeat, args=(std, symbols,))
+    thread = threading.Timer(0.1, repeat, args=(std, symbols,))
     thread.start()
 
 
 def repeat(std, symbols):
     print('Now:', time.strftime('%H:%M:%S', time.localtime()), "Thread:", threading.current_thread().ident, "Symbols:", len(symbols))
-    print("--------------------------------")
+    print("----------------------------------------------")
     # 实时分时行情
     num = 0
     while num < len(symbols):
@@ -70,7 +70,7 @@ def repeat(std, symbols):
 if __name__ == '__main__':
     make_pid('mootdx_quotes')
 
-    num_timer = 7
+    num_timer = 5
 
     stock_symbols = get_stock_symbols()
     total = len(stock_symbols)

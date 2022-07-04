@@ -22,7 +22,7 @@ def job_mootdx_quotes_kill(cron: CronTab):
 def job_mootdx_stocks(cron: CronTab):
     job_mootdx_remove('python_mootdx_stocks')
     job = cron.new(command='nohup python ' + sys.path[0] + '/mootdx_stocks.py > ' + sys.path[0] + '/mootdx_stocks.log 2>&1 &', comment='python_mootdx_stocks')
-    job.setall("30 15 * * 1-5")
+    job.setall("0 9,16 * * 1-5")
 
 
 if __name__ == '__main__':
