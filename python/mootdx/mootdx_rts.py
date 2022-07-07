@@ -1,3 +1,4 @@
+from threading import Thread
 from time import sleep
 
 from redis import Redis
@@ -23,6 +24,10 @@ def kill_pid(name):
     with open(sys.path[0] + '/pids/' + name + '.pid', encoding='utf-8') as f:
         os.kill(int(f.readline(16)), 9)
 
+def async_call(fn):
+    def wrapper(*args, **kwargs):
+        Thread(target=fn, args=args, kwargs=kwargs).start()
+    return wrapper
 
 class MootdxRTS(object):
     @staticmethod
@@ -107,6 +112,7 @@ class MootdxCli(object):
                 sleep(0.5)
                 index += 80
 
+    #@async_call
     def save(self, cur_dt: date, df: DataFrame):
         retention_msecs = 604800000
         ktv_tuples = []

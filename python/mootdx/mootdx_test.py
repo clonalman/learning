@@ -38,11 +38,14 @@ def rename(std):
     for key in keys:
         items = key.decode("utf-8").split(':')
         newKey = items[0]
-        if items[1] == "0" or items[1] == "1":
+        if items[1] == "0" or items[1] == "1" or items[1] == "9":
             if items[1] == "0":
                 newKey += ":" + items[2] + ".SZ"
             if items[1] == "1":
                 newKey += ":" + items[2] + ".SH"
+            if items[1] == "9":
+                newKey += ":" + items[2] + ".SF"
+
             if len(items) > 3:
                 newKey += ":" + items[3]
             if len(items) > 4:
